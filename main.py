@@ -112,17 +112,17 @@ class World:
         self.things.append(thing)
 
 class Screen:
-    def __init__(self, w, h, eye):
+    def __init__(self, w, h, focal_length):
         self.width = w
         self.height = h
-        self.eye = eye
+        self.focal = Vector(0, 0, focal_length*(-1))
     
-    def render(self, world):
+    def render(self, world, w, h):
         pixels = []
-        for i in range(self.height):
+        for i in range(h):
             pixels.append([])
-            for j in range(self.width):
-                # find ray from eye to pixel
+            for j in range(w):
+                # find ray from focal to pixel
                 # intersect all objects with ray
                 # get closest (i.e. shortest ray value
                 # get surface normal
@@ -130,8 +130,8 @@ class Screen:
                 # transform to lightness
                 # assign pixel value 1-255 on output
 
-                # ray from eye to pixel
-                ray = Ray(self.eye, Vector(j - (self.width / 2), i - (self.height / 2), 0) - self.eye)
+                # ray from focal to pixel
+                ray = Ray(self.focal, Vector((j - (w / 2))*self.width/w, (i - (h / 2))*self.height/h, 0) - self.focal)
                 if modulo(ray.direction) == v_o:
                     pixels[i].append(255)
                     continue
@@ -149,6 +149,7 @@ world.add(Box(Vector(0, -120, 40), 100, 100, 100))
 world.add(Box(Vector(-100, -20, 50), 50, 50, 50))
 world.add(Box(Vector(20, 30, 40), 30, 30, 30))
 
-screen = Screen(300, 300, Vector(0,0,-100))
+screen = Screen(20, 20, 3)
+# screen.render(world, 500, 500)
 # print(screen.render(world))
-Image.fromarray(array(screen.render(world))).show()
+Image.fromarray(array(screen.render(world, 1024, 1024))).show()
