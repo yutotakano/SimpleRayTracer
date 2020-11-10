@@ -60,16 +60,16 @@ class Box:
         # if ANY plane has a solution return true, together with value for ray distance, and plane normal
 
         n1 = Vector(0, 0, 1)
-        p1 = Plane(n1*(-1), dot(n1*(-1), self.p1))
+        p1 = Plane(n1, dot(n1, self.p1))
         p2 = Plane(n1, dot(n1, self.p1 + Vector(0, 0, self.d)))
 
         n2 = Vector(0, 1, 0)
-        p3 = Plane(n2*( -1), dot(n2*(-1), self.p1))
-        p4 = Plane(n2, dot(n2, self.p1 + Vector(0, self.w, 0)))
+        p3 = Plane(n2, dot(n2, self.p1))
+        p4 = Plane(n2, dot(n2, self.p1 + Vector(0, self.h, 0)))
         
         n3 = Vector(1, 0, 0)
-        p5 = Plane(n3*(-1), dot(n3*(-1), self.p1))
-        p6 = Plane(n3, dot(n3, self.p1 + Vector(self.h, 0, 0)))
+        p5 = Plane(n3, dot(n3, self.p1))
+        p6 = Plane(n3, dot(n3, self.p1 + Vector(self.w, 0, 0)))
 
         trues = []
         for plane in [p1, p2, p3, p4, p5, p6]:
@@ -136,19 +136,19 @@ class Screen:
                     pixels[i].append(255)
                     continue
                 # intersections is a list with [None, (True, 3.2, Vector), etc]
-                intersections = [thing.intersect(ray) for thing in world.things] + [(True, 100, Vector(1,0,0))]
+                intersections = [thing.intersect(ray) for thing in world.things] + [(True, 300, Vector(0,0,-1))]
                 # get closest
                 closest_intersection = min([intersection for intersection in intersections if intersection], key=(lambda item: item[1]))
                 # print(closest_intersection)
-                pixels[i].append((80*math.acos((dot(closest_intersection[2],ray.direction)) / (modulo(closest_intersection[2])*modulo(ray.direction)))))
+                pixels[i].append(255 - (80*math.acos((dot(closest_intersection[2],ray.direction)) / (modulo(closest_intersection[2])*modulo(ray.direction)))))
         return pixels
 
 
 world = World()
-world.add(Box(Vector(-10, -70, -10), 20, 20, 20))
+world.add(Box(Vector(0, -120, 40), 100, 100, 100))
 world.add(Box(Vector(-100, -20, 50), 50, 50, 50))
 world.add(Box(Vector(20, 30, 40), 30, 30, 30))
 
-screen = Screen(200, 300, Vector(0,0,-100))
+screen = Screen(300, 300, Vector(0,0,-100))
 # print(screen.render(world))
 Image.fromarray(array(screen.render(world))).show()
