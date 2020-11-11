@@ -15,7 +15,7 @@ class Vector:
         return Vector(self.x - v.x, self.y - v.y, self.z - v.z)
 
     def __truediv__(self, c):
-        return Vector(self.x * c, self.y / c, self.z / c)
+        return Vector(self.x / c, self.y / c, self.z / c)
     
     def __mul__(self, c):
         return Vector(self.x * c, self.y * c, self.z * c)
@@ -88,7 +88,29 @@ class Box:
             return min(trues, key=(lambda a: a[1]))
         return None
 
-
+class Sphere:
+    def __init__(self, p1, r):
+        self.center = p1
+        self.radius = r
+    
+    def intersect(self, ray):
+        # from https://en.wikipedia.org/wiki/Line%E2%80%93sphere_intersection
+        nabla = (ray.direction.unit().dot(ray.origin - self.center))**2 - ((ray.origin - self.center).modulo()**2 - self.radius**2)
+        if nabla < 0:
+            # no solution
+            return None
+        elif nabla == 0:
+            # one solution
+            t = (-1)*(ray.direction.unit().dot(ray.origin - self.center))
+            normal = ray.origin + ray.direction*t - self.center
+            return (True, t, normal)
+        # two solutions, take frontmost one
+        base = (-1)*(ray.direction.unit().dot(ray.origin - self.center))
+        t1 = base + math.sqrt(nabla)
+        t2 = base - math.sqrt(nabla)
+        t = min([t1, t2])
+        normal = ray.origin + ray.direction*t - self.center
+        return (True, t, normal)
 
 class Plane:
     def __init__(self, n, d):
@@ -151,7 +173,7 @@ class Screen:
                     if len(intersections) == 0:
                         continue
                     closest_intersection = min(intersections, key=(lambda item: item[1]))
-                    value += (255 - (80*math.acos((closest_intersection[2].dot(ray.direction)) / (closest_intersection[2].modulo*ray.direction.modulo))))
+                    value += (255 - (80*math.acos((closest_intersection[2].dot(ray.direction)) / (closest_intersection[2].modulo()*ray.direction.modulo()))))
 
                 pixels[i].append(value/4.0)
         return pixels
@@ -160,8 +182,9 @@ class Screen:
 world = World()
 world.add(Box(Vector(0, -120, 40), 100, 100, 100))
 world.add(Box(Vector(-100, -20, 50), 50, 50, 50))
-world.add(Box(Vector(20, 30, 40), 30, 30, 30))
+# world.add(Box(Vector(20, 30, 40), 30, 30, 30))
+world.add(Sphere(Vector(50, 50, 60), 30))
 
 screen = Screen(100, 100, 25)
 
-Image.fromarray(array(screen.render(world, 500, 500))).show()
+Image.fromarray(array(screen.render(world, 600, 600))).show()
