@@ -118,6 +118,12 @@ class Screen:
         self.focal = Vector(0, 0, focal_length*(-1))
     
     def render(self, world, w, h):
+        jitter = [
+            -1.0/4.0,  3.0/4.0,
+             3.0/4.0,  1.0/3.0,
+            -3.0/4.0, -1.0/4.0,
+             1.0/4.0, -3.0/4.0,
+        ]
         pixels = []
         for i in range(h):
             pixels.append([])
@@ -129,18 +135,25 @@ class Screen:
                 # find angle from surface normal to ray
                 # transform to lightness
                 # assign pixel value 1-255 on output
+                value = 0
+                # take 4 samples, average
+                for sample in range(3):
+                    # ray from focal to pixel
+                    ray = Ray(self.focal, Vector(((j + jitter[2*sample]) - (w / 2))*self.width/w, ((i+ jitter[2*sample+1]) - (h / 2))*self.height/h, 0) - self.focal)
+                    if modulo(ray.direction) == v_o:
+                        value += 255
+                        continue
+                    # intersections is a list with [None, (True, 3.2, Vector), etc]
+                    # maybe add + [(True, 300, Vector(0,0,-1))]
+                    intersections = [thing.intersect(ray) for thing in world.things]
+                    intersections = [intersection for intersection in intersections if intersection]
+                    # get closest
+                    if len(intersections) == 0:
+                        continue
+                    closest_intersection = min(intersections, key=(lambda item: item[1]))
+                    value += (255 - (80*math.acos((dot(closest_intersection[2],ray.direction)) / (modulo(closest_intersection[2])*modulo(ray.direction)))))
 
-                # ray from focal to pixel
-                ray = Ray(self.focal, Vector((j - (w / 2))*self.width/w, (i - (h / 2))*self.height/h, 0) - self.focal)
-                if modulo(ray.direction) == v_o:
-                    pixels[i].append(255)
-                    continue
-                # intersections is a list with [None, (True, 3.2, Vector), etc]
-                intersections = [thing.intersect(ray) for thing in world.things] + [(True, 300, Vector(0,0,-1))]
-                # get closest
-                closest_intersection = min([intersection for intersection in intersections if intersection], key=(lambda item: item[1]))
-                # print(closest_intersection)
-                pixels[i].append(255 - (80*math.acos((dot(closest_intersection[2],ray.direction)) / (modulo(closest_intersection[2])*modulo(ray.direction)))))
+                pixels[i].append(value/4.0)
         return pixels
 
 
@@ -149,7 +162,6 @@ world.add(Box(Vector(0, -120, 40), 100, 100, 100))
 world.add(Box(Vector(-100, -20, 50), 50, 50, 50))
 world.add(Box(Vector(20, 30, 40), 30, 30, 30))
 
-screen = Screen(20, 20, 3)
-# screen.render(world, 500, 500)
-# print(screen.render(world))
-Image.fromarray(array(screen.render(world, 1024, 1024))).show()
+screen = Screen(100, 100, 25)
+
+Image.fromarray(array(screen.render(world, 500, 500))).show()
