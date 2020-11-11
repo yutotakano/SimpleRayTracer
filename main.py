@@ -23,21 +23,21 @@ class Vector:
     def __str__(self):
         return '(' + str(self.x) + ', ' + str(self.y) + ', ' + str(self.z) + ')'
 
-def dot(v, w):
-    return v.x*w.x + v.y*w.y + v.z*w.z
-
-def cross(v, w):
-    return Vector(v.y*w.z - v.z*w.y, v.z*w.x - v.x*w.z, v.x*w.y - v.y*w.x)
-
-def modulo(v):
-    return math.sqrt(v.x**2 + v.y**2 + v.z**2)
-
-def unit(v):
-    return v / modulo(v)
+    def modulo(self):
+        return math.sqrt(self.x**2 + self.y**2 + self.z**2)
+    
+    def unit(self):
+        return self / self.modulo()
+    
+    def dot(self, w):
+        return self.x*w.x + self.y*w.y + self.z*w.z
+    
+    def cross(self, w):
+        return Vector(self.y*w.z - self.z*w.y, self.z*w.x - self.x*w.z, self.x*w.y - self.y*w.x)
 
 def containing_plane(v, w):
-    normal = cross(v, w)
-    d = dot(normal, v)
+    normal = v.cross(w)
+    d = normal.dot(v)
     return Plane(normal, d)
 
 v_o = Vector(0, 0, 0)
@@ -60,16 +60,16 @@ class Box:
         # if ANY plane has a solution return true, together with value for ray distance, and plane normal
 
         n1 = Vector(0, 0, 1)
-        p1 = Plane(n1, dot(n1, self.p1))
-        p2 = Plane(n1, dot(n1, self.p1 + Vector(0, 0, self.d)))
+        p1 = Plane(n1, n1.dot(self.p1))
+        p2 = Plane(n1, n1.dot(self.p1 + Vector(0, 0, self.d)))
 
         n2 = Vector(0, 1, 0)
-        p3 = Plane(n2, dot(n2, self.p1))
-        p4 = Plane(n2, dot(n2, self.p1 + Vector(0, self.h, 0)))
+        p3 = Plane(n2, n2.dot(self.p1))
+        p4 = Plane(n2, n2.dot(self.p1 + Vector(0, self.h, 0)))
         
         n3 = Vector(1, 0, 0)
-        p5 = Plane(n3, dot(n3, self.p1))
-        p6 = Plane(n3, dot(n3, self.p1 + Vector(self.w, 0, 0)))
+        p5 = Plane(n3, n3.dot(self.p1))
+        p6 = Plane(n3, n3.dot(self.p1 + Vector(self.w, 0, 0)))
 
         trues = []
         for plane in [p1, p2, p3, p4, p5, p6]:
@@ -88,20 +88,20 @@ class Box:
             return min(trues, key=(lambda a: a[1]))
         return None
 
-        
+
 
 class Plane:
     def __init__(self, n, d):
-        self.normal = unit(n)
+        self.normal = n.unit()
         self.d = d
     def __repr__(self):
         return 'Normal: ' + str(self.normal) + ', d: ' + str(self.d)
     
     def intersect(self, ray):
-        if dot(ray.direction, self.normal) == 0:
+        if ray.direction.dot(self.normal) == 0:
             return (0, ray)
 
-        t = (dot(ray.origin, self.normal) - self.d) / (dot(ray.direction, self.normal)*(-1))
+        t = (ray.origin.dot(self.normal) - self.d) / (ray.direction.dot(self.normal)*(-1))
         return (t, ray.origin + ray.direction*t)
 
 class World:
@@ -140,7 +140,7 @@ class Screen:
                 for sample in range(3):
                     # ray from focal to pixel
                     ray = Ray(self.focal, Vector(((j + jitter[2*sample]) - (w / 2))*self.width/w, ((i+ jitter[2*sample+1]) - (h / 2))*self.height/h, 0) - self.focal)
-                    if modulo(ray.direction) == v_o:
+                    if ray.direction.modulo() == v_o:
                         value += 255
                         continue
                     # intersections is a list with [None, (True, 3.2, Vector), etc]
@@ -151,7 +151,7 @@ class Screen:
                     if len(intersections) == 0:
                         continue
                     closest_intersection = min(intersections, key=(lambda item: item[1]))
-                    value += (255 - (80*math.acos((dot(closest_intersection[2],ray.direction)) / (modulo(closest_intersection[2])*modulo(ray.direction)))))
+                    value += (255 - (80*math.acos((closest_intersection[2].dot(ray.direction)) / (closest_intersection[2].modulo*ray.direction.modulo))))
 
                 pixels[i].append(value/4.0)
         return pixels
