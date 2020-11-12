@@ -166,8 +166,7 @@ class Screen:
                         value += 255
                         continue
                     # intersections is a list with [None, (True, 3.2, Vector), etc]
-                    # maybe add + [(True, 300, Vector(0,0,-1))]
-                    intersections = [thing.intersect(ray) for thing in world.things]
+                    intersections = [thing.intersect(ray) for thing in world.things] + [(True, 300, Vector(0,0,-1))]
                     intersections = [intersection for intersection in intersections if intersection]
                     # get closest
                     if len(intersections) == 0:
