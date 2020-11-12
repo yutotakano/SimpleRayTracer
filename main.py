@@ -173,7 +173,7 @@ class Screen:
                     if len(intersections) == 0:
                         continue
                     closest_intersection = min(intersections, key=(lambda item: item[1]))
-                    value += (255 - (80*math.acos((closest_intersection[2].dot(ray.direction)) / (closest_intersection[2].modulo()*ray.direction.modulo()))))
+                    value += (80*math.acos((closest_intersection[2].dot(ray.direction)) / (closest_intersection[2].modulo()*ray.direction.modulo())))
 
                 pixels[i].append(value/4.0)
         return pixels
