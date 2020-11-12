@@ -120,11 +120,11 @@ class Plane:
         return 'Normal: ' + str(self.normal) + ', d: ' + str(self.d)
     
     def intersect(self, ray):
-        if ray.direction.dot(self.normal) == 0:
+        if ray.direction.unit().dot(self.normal) == 0:
             return (0, ray)
 
-        t = (ray.origin.dot(self.normal) - self.d) / (ray.direction.dot(self.normal)*(-1))
-        return (t, ray.origin + ray.direction*t)
+        t = (ray.origin.dot(self.normal) - self.d) / (ray.direction.unit().dot(self.normal)*(-1))
+        return (t, ray.origin + ray.direction.unit()*t)
 
 class World:
     def __init__(self):
