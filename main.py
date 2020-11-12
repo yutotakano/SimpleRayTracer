@@ -183,8 +183,8 @@ world = World()
 world.add(Box(Vector(0, -120, 40), 100, 100, 100))
 world.add(Box(Vector(-100, -20, 50), 50, 50, 50))
 # world.add(Box(Vector(20, 30, 40), 30, 30, 30))
-world.add(Sphere(Vector(50, 50, 40), 30))
+world.add(Sphere(Vector(20, 10, 50), 40))
 
 screen = Screen(100, 100, 25)
 
-Image.fromarray(array(screen.render(world, 100, 100))).show()
+Image.fromarray(array(screen.render(world, 512, 512))).show()
