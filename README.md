@@ -4,4 +4,4 @@ Super basic ray-tracer build in Python to practice vector math in 3 dimensions. 
 
 Looks cool though!
 
-![Image](https://i.imgur.com/Semixfo.png)
+![Image](https://i.imgur.com/9Tl59Qf.png)
