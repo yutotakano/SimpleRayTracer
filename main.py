@@ -159,7 +159,7 @@ class Screen:
                 # assign pixel value 1-255 on output
                 value = 0
                 # take 4 samples, average
-                for sample in range(3):
+                for sample in range(4):
                     # ray from focal to pixel
                     ray = Ray(self.focal, Vector(((j + jitter[2*sample]) - (w / 2))*self.width/w, ((i+ jitter[2*sample+1]) - (h / 2))*self.height/h, 0) - self.focal)
                     if ray.direction.modulo() == v_o:
