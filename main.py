@@ -102,14 +102,14 @@ class Sphere:
         elif nabla == 0:
             # one solution
             t = (-1)*(ray.direction.unit().dot(ray.origin - self.center))
-            normal = ray.origin + ray.direction*t - self.center
+            normal = (ray.origin + ray.direction.unit()*t - self.center).unit()
             return (True, t, normal)
         # two solutions, take frontmost one
         base = (-1)*(ray.direction.unit().dot(ray.origin - self.center))
         t1 = base + math.sqrt(nabla)
         t2 = base - math.sqrt(nabla)
         t = min([t1, t2])
-        normal = ray.origin + ray.direction*t - self.center
+        normal = (ray.origin + ray.direction.unit()*t - self.center).unit()
         return (True, t, normal)
 
 class Plane:
@@ -183,8 +183,8 @@ world = World()
 world.add(Box(Vector(0, -120, 40), 100, 100, 100))
 world.add(Box(Vector(-100, -20, 50), 50, 50, 50))
 # world.add(Box(Vector(20, 30, 40), 30, 30, 30))
-world.add(Sphere(Vector(50, 50, 60), 30))
+world.add(Sphere(Vector(50, 50, 40), 30))
 
 screen = Screen(100, 100, 25)
 
-Image.fromarray(array(screen.render(world, 600, 600))).show()
+Image.fromarray(array(screen.render(world, 100, 100))).show()
