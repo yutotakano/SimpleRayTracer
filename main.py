@@ -60,15 +60,15 @@ class Box:
         # if ANY plane has a solution return true, together with value for ray distance, and plane normal
 
         n1 = Vector(0, 0, 1)
-        p1 = Plane(n1, n1.dot(self.p1))
+        p1 = Plane(n1*(-1), (n1*(-1)).dot(self.p1))
         p2 = Plane(n1, n1.dot(self.p1 + Vector(0, 0, self.d)))
 
         n2 = Vector(0, 1, 0)
-        p3 = Plane(n2, n2.dot(self.p1))
+        p3 = Plane(n2*(-1), (n2*(-1)).dot(self.p1))
         p4 = Plane(n2, n2.dot(self.p1 + Vector(0, self.h, 0)))
         
         n3 = Vector(1, 0, 0)
-        p5 = Plane(n3, n3.dot(self.p1))
+        p5 = Plane(n3*(-1), (n3*(-1)).dot(self.p1))
         p6 = Plane(n3, n3.dot(self.p1 + Vector(self.w, 0, 0)))
 
         trues = []
